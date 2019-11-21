@@ -61,6 +61,8 @@ class FileDocument(orm.Model):
                     "Le fichier est vide. Pas de mise à jour")
             # first line must not be imported
             line = str_io.readline()
+            # remove non-breaking space
+            line = line.replace('\xa0', ' ')
             #print 'Début tmp', time.ctime()
             while line:
                 if line[:2] == 'PR':
@@ -95,6 +97,7 @@ class FileDocument(orm.Model):
                     #print 'break Tmp'
                     break
                 line = str_io.readline()
+                line = line.replace('\xa0', ' ')
             #print ' end while Tmp', time.ctime()
             #if sql_error_messages:
             #    return sql_error_messages
