@@ -83,10 +83,16 @@ class DepositSlip(orm.Model):
         else:
             return ''
 
+    def _get_ignored_carrier_codes(self):
+        return [
+            "EI", "AI", "COLI",
+        ]
+
     def create_lines_vals(self, cr, uid, deposit, context=None):
         lines = []
+        ignored_codes = self._get_ignored_carrier_codes()
         for picking in deposit.picking_ids:
-            if picking.carrier_code not in ['EI', 'AI', 'COLI']:
+            if picking.carrier_code not in ignored_codes:
                 address = picking.partner_id
                 dropoff_site = None
                 model = self.pool['ir.model'].search(
