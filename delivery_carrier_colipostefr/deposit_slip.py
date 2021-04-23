@@ -185,7 +185,7 @@ class DepositSlip(orm.Model):
             "Identifiant du client", "Date expédition",
             "Date d'émission du bordereau", "Version Format Fichier",
             "Site Prise en charge", "Nom commercial"],
-            dialect=LaposteDialect, encoding='ISO-8859-1')
+            dialect=LaposteDialect, encoding=ENCODING, errors="ignore")
         b.writerow(header)
         w = unicodecsv.DictWriter(f, [
             "Type d'enregistrement", "Code produit", "Numéro du colis",
@@ -204,36 +204,9 @@ class DepositSlip(orm.Model):
             "Identifiant Colissimo du destinataire", "Téléphone", "Courriel",
             "Téléphone portable", "Identifiant du point de retrait",
             "Code avoir/promotion", "Type Alerte Destinataire"],
-            dialect=LaposteDialect, encoding=ENCODING)
+            dialect=LaposteDialect, encoding=ENCODING, errors="ignore")
         for line in lines:
-            try:
-                w.writerow(line)
-            except UnicodeEncodeError as e:
-                dct = line.copy()
-                columns2hide = [
-                    'Contre-remboursement',
-                    'Assurance Ad Valorem',
-                    'Code Pays Destinataire',
-                    'Poids du colis',
-                    'Type de TRI Colis',
-                    'Code avoir/promotion',
-                    'Information de routage',
-                    'Devise Contre remboursement',
-                    'Devise assurance',
-                    'Livraison Samedi',
-                    'Code produit',
-                    ]
-                for elm in columns2hide:
-                    del dct[elm]
-                dct2string = unicode(dct).replace("', '", "'\n'")
-                raise orm.except_orm(
-                    "Encoding Error",
-                    u"Problème lors de l'encodage en '%s'\n"
-                    u"%s\n\n1/ Recherchez cette donnée dans les infos ci-dessous "
-                    u"qui proviennent de vos bons de livraisons "
-                    u"ou données clients"
-                    u"\n%s\n\n2/ Corriger la dans l'ERP"
-                    % (ENCODING, e.args, dct2string))
+            w.writerow(line)
         f.seek(0)
         datas = f.read()
         return datas
