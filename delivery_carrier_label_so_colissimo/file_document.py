@@ -45,7 +45,10 @@ class FileDocument(orm.Model):
             #sql_error_counter = 0
             #sql_error_messages = []
             str_io = StringIO()
-            str_io.writelines(base64.b64decode(file_doc.datas))
+            raw_data = base64.b64decode(file_doc.datas)
+            str_io.writelines(
+                raw_data.decode('ascii', errors='replace').encode('ascii', errors='replace')
+            )
             str_io.seek(0)
             line = str_io.readline()
             if line:
